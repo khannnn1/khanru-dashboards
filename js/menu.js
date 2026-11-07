@@ -40,23 +40,14 @@ function montarMenu(nav, paginaAtual, podeVerFinancas) {
   nav.innerHTML = `
     <a class="menu-logo" href="dashboard.html">Khanru 💞</a>
     <ul class="menu-lista">${itens}</ul>
-    <a class="menu-link menu-sair" href="index.html">
+    <button id="botao-sair" class="menu-link menu-sair" type="button">
       <span class="menu-icone" aria-hidden="true">🚪</span>
       <span>Sair</span>
-    </a>`;
+    </button>`;
 }
 
-// No navegador, monta o menu. No Node (testes), só exporta as funções.
-if (typeof document !== "undefined") {
-  const nav = document.getElementById("menu");
-  if (nav) {
-    // Até a etapa 2 (login) não sabemos quem está logado, então o
-    // item aparece para todos. Depois isso vem de profiles.can_see_finance.
-    const podeVerFinancas = true;
-    montarMenu(nav, nomeDaPagina(location.pathname), podeVerFinancas);
-  }
-}
-
+// Quem chama montarMenu é o sessao.js, depois de saber quem está logado.
+// No Node (testes), este arquivo só exporta as funções puras.
 if (typeof module !== "undefined") {
   module.exports = { ITENS_MENU, nomeDaPagina, itensVisiveis };
 }

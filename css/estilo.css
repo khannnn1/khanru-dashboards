@@ -145,6 +145,16 @@ h2 {
 
 .menu-sair {
   margin-top: auto;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+/* Esconde a página até o login ser conferido (evita "piscar" o conteúdo) */
+.carregando body {
+  visibility: hidden;
 }
 
 /* No celular o menu vira uma barra fixa embaixo */
@@ -171,14 +181,18 @@ h2 {
     z-index: 10;
   }
 
-  .menu-logo,
-  .menu-sair {
+  .menu-logo {
     display: none;
+  }
+
+  .menu-sair {
+    margin-top: 0;
+    width: auto;
   }
 
   .menu-lista {
     flex-direction: row;
-    width: 100%;
+    flex: 1;
     justify-content: space-around;
   }
 
@@ -225,6 +239,11 @@ h2 {
 
 .botao:hover {
   background: var(--cor-destaque-escuro);
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .botao-secundario {
