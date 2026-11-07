@@ -14,6 +14,7 @@
   --cor-realce: #ffe3a3;
   --cor-borda: #edd9cc;
   --cor-menu: #fffaf5;
+  --cor-perigo: #b3261e;
   --sombra: 0 6px 18px rgba(120, 70, 60, 0.12);
 
   --raio: 14px;
@@ -33,6 +34,7 @@
     --cor-realce: #6b5227;
     --cor-borda: #4a3739;
     --cor-menu: #2c2123;
+    --cor-perigo: #f2867d;
     --sombra: 0 6px 18px rgba(0, 0, 0, 0.35);
   }
 }
@@ -40,6 +42,11 @@
 /* ---------- Base ---------- */
 * {
   box-sizing: border-box;
+}
+
+/* Garante que o atributo hidden sempre esconda, mesmo em botões */
+[hidden] {
+  display: none !important;
 }
 
 body {
@@ -307,4 +314,193 @@ h2 {
   text-align: center;
   color: var(--cor-texto-suave);
   font-size: 0.9rem;
+}
+
+/* ---------- Avisos ---------- */
+.aviso-erro {
+  background: var(--cor-cartao);
+  border: 1px solid var(--cor-perigo);
+  color: var(--cor-perigo);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.botao-perigo {
+  background: transparent;
+  color: var(--cor-perigo);
+  border: 1px solid var(--cor-perigo);
+}
+
+.botao-perigo:hover {
+  background: var(--cor-perigo);
+  color: var(--cor-cartao);
+}
+
+/* ---------- Diálogo (janela por cima da página) ---------- */
+.dialogo {
+  width: min(480px, calc(100vw - 32px));
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-cartao);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra);
+  padding: 24px;
+}
+
+.dialogo::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.dialogo fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.dialogo legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+.campo-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.campo-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cor-destaque);
+}
+
+.campos-lado-a-lado {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .campos-lado-a-lado {
+    grid-template-columns: 1fr;
+  }
+}
+
+.botoes-dialogo {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.botoes-dialogo .botao-perigo {
+  margin-right: auto;
+}
+
+.cores-evento {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bolinha-cor {
+  position: relative;
+  cursor: pointer;
+}
+
+.bolinha-cor input {
+  position: absolute;
+  opacity: 0;
+}
+
+.bolinha-cor span:first-of-type {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  outline: 1px solid var(--cor-borda);
+}
+
+.bolinha-cor input:checked + span {
+  border-color: var(--cor-cartao);
+  outline: 3px solid var(--cor-texto);
+}
+
+.bolinha-cor input:focus-visible + span {
+  outline: 3px solid var(--cor-destaque);
+}
+
+/* ---------- Agenda (FullCalendar) ---------- */
+.conteudo-largo {
+  max-width: 1200px;
+}
+
+#calendario {
+  --fc-border-color: var(--cor-borda);
+  --fc-page-bg-color: var(--cor-cartao);
+  --fc-neutral-bg-color: var(--cor-fundo);
+  --fc-list-event-hover-bg-color: var(--cor-fundo);
+  --fc-today-bg-color: color-mix(in srgb, var(--cor-realce) 45%, transparent);
+  --fc-event-bg-color: var(--cor-destaque);
+  --fc-event-border-color: var(--cor-destaque);
+  --fc-event-text-color: var(--cor-texto-no-destaque);
+  --fc-button-bg-color: var(--cor-cartao);
+  --fc-button-border-color: var(--cor-borda);
+  --fc-button-text-color: var(--cor-texto);
+  --fc-button-hover-bg-color: var(--cor-fundo);
+  --fc-button-hover-border-color: var(--cor-borda);
+  --fc-button-active-bg-color: var(--cor-destaque);
+  --fc-button-active-border-color: var(--cor-destaque);
+  --fc-now-indicator-color: var(--cor-perigo);
+}
+
+#calendario .fc-button-active {
+  color: var(--cor-texto-no-destaque);
+}
+
+#calendario .fc-toolbar-title {
+  font-size: 1.25rem;
+}
+
+#calendario .fc-toolbar-title::first-letter {
+  text-transform: uppercase;
+}
+
+#calendario a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#calendario .fc-daygrid-day,
+#calendario .fc-timegrid-slot {
+  cursor: pointer;
+}
+
+/* Eventos que o par compartilhou: borda tracejada e sem arrastar */
+#calendario .evento-parceiro {
+  border-style: dashed;
+  opacity: 0.85;
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  #calendario .fc-toolbar-title {
+    font-size: 1rem;
+  }
+
+  #calendario .fc-toolbar {
+    gap: 8px;
+  }
 }
