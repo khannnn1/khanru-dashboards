@@ -15,6 +15,12 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
 - O projeto Supabase foi criado com "Automatically expose new tables"
   desligado: toda migração que cria tabela precisa dos `grant` de acesso
   (para `authenticated`) além das políticas de RLS.
+- Grant de coluna (`grant update (col)`) não tira um grant de tabela que já
+  exista. Para restringir colunas, faça `revoke all ... from anon,
+  authenticated` antes. Os default privileges do schema public já foram
+  zerados (migração `travar_permissoes`); funções novas chamadas pelo site
+  também precisam de `grant execute` explícito.
+- Toda tabela nova entra no `supabase/tests/rls_test.sql`.
 - Segredos (Pluggy, service_role) só em Edge Functions, nunca no front nem no Git.
   A `anon key` do Supabase pode ficar no front (é pública por design).
 - Cores sempre por variáveis CSS do tema (`css/estilo.css`).
@@ -36,6 +42,11 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
 - `supabase/`: `config.toml`, migrações (`migrations/`) e Edge Functions
   (`functions/`). Projeto ligado: `ajuwvwdomqifgtozutls` (São Paulo).
 - `tests/`: testes das funções puras, rodam com `node --test`.
+- `supabase/tests/rls_test.sql`: teste de RLS; colar no SQL Editor e rodar
+  (faz rollback, não deixa nada salvo). Atualizar a cada tabela nova.
+- Tabelas: `events` e `reminders` (dono faz tudo, parceiro só lê se
+  `shared`), `notes` (sempre privadas). Colunas em português, exceto
+  `owner_id` e `shared`.
 
 ## Comandos
 
