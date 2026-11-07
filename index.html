@@ -25,20 +25,43 @@
     </form>
 
     <p id="mensagem" class="mensagem" role="status"></p>
-
-    <!-- Temporário: some na etapa 2, quando o login de verdade existir -->
-    <p class="mensagem">
-      <a href="dashboard.html">Ver as páginas sem login (provisório)</a>
-    </p>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/sessao.js"></script>
   <script>
-    // O login de verdade (Supabase Auth) entra na etapa 2.
-    document.getElementById("form-login").addEventListener("submit", (evento) => {
+    const form = document.getElementById("form-login");
+    const mensagem = document.getElementById("mensagem");
+    const botao = form.querySelector("button");
+
+    // Quem já está logado vai direto para o dashboard.
+    obterCliente().auth.getSession().then(({ data }) => {
+      if (data.session) location.replace(PAGINA_INICIAL);
+    });
+
+    form.addEventListener("submit", async (evento) => {
       evento.preventDefault();
-      document.getElementById("mensagem").textContent =
-        "O login ainda não está ligado. Ele chega na etapa 2.";
+      const email = form.email.value.trim();
+      const senha = form.senha.value;
+
+      if (!email || !senha) {
+        mensagem.textContent = "Preencha e-mail e senha.";
+        return;
+      }
+
+      botao.disabled = true;
+      mensagem.textContent = "Entrando...";
+
+      const { error } = await obterCliente().auth.signInWithPassword({ email, password: senha });
+
+      if (error) {
+        mensagem.textContent = traduzirErroLogin(error);
+        botao.disabled = false;
+        return;
+      }
+      location.replace(PAGINA_INICIAL);
     });
   </script>
 </body>

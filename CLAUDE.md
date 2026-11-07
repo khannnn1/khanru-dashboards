@@ -29,6 +29,10 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
 - `css/estilo.css`: variáveis de tema e estilos comuns.
 - `js/config.js`: URL e anon key do Supabase (públicas).
 - `js/menu.js`: monta o menu lateral/inferior em todas as páginas.
+- `js/sessao.js`: cliente Supabase, `protegerPagina()` (redireciona quem não
+  está logado, carrega o perfil, monta o menu) e o botão Sair.
+- `profiles.can_see_finance` só muda por SQL no painel: o grant de update
+  cobre só `nome` e `tema`.
 - `supabase/`: `config.toml`, migrações (`migrations/`) e Edge Functions
   (`functions/`). Projeto ligado: `ajuwvwdomqifgtozutls` (São Paulo).
 - `tests/`: testes das funções puras, rodam com `node --test`.
