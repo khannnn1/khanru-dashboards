@@ -1,0 +1,15 @@
+# Segredos: nunca vão para o Git
+.env
+.env.*
+!.env.example
+supabase/.env
+
+# Arquivos temporários do Supabase CLI
+supabase/.temp/
+supabase/.branches/
+
+# Node / editores / sistema
+node_modules/
+.vscode/
+.DS_Store
+Thumbs.db

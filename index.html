@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · Khanru</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💞</text></svg>">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body class="pagina-login">
+  <main class="cartao cartao-login">
+    <h1>Khanru 💞</h1>
+    <p class="subtitulo">Entre no seu dashboard</p>
+
+    <form id="form-login" novalidate>
+      <label class="campo">
+        <span>E-mail</span>
+        <input type="email" name="email" autocomplete="email" required>
+      </label>
+      <label class="campo">
+        <span>Senha</span>
+        <input type="password" name="senha" autocomplete="current-password" required>
+      </label>
+      <button class="botao" type="submit">Entrar</button>
+    </form>
+
+    <p id="mensagem" class="mensagem" role="status"></p>
+
+    <!-- Temporário: some na etapa 2, quando o login de verdade existir -->
+    <p class="mensagem">
+      <a href="dashboard.html">Ver as páginas sem login (provisório)</a>
+    </p>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script>
+    // O login de verdade (Supabase Auth) entra na etapa 2.
+    document.getElementById("form-login").addEventListener("submit", (evento) => {
+      evento.preventDefault();
+      document.getElementById("mensagem").textContent =
+        "O login ainda não está ligado. Ele chega na etapa 2.";
+    });
+  </script>
+</body>
+</html>
