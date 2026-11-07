@@ -293,6 +293,8 @@ h2 {
 }
 
 .campo input {
+  width: 100%;
+  min-width: 0;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--cor-borda);
@@ -347,7 +349,8 @@ h2 {
 
 /* ---------- Diálogo (janela por cima da página) ---------- */
 .dialogo {
-  width: min(480px, calc(100vw - 32px));
+  width: min(560px, calc(100vw - 32px));
+  overflow-x: hidden;
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio);
   background: var(--cor-cartao);
@@ -387,11 +390,11 @@ h2 {
 
 .campos-lado-a-lado {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
   .campos-lado-a-lado {
     grid-template-columns: 1fr;
   }
