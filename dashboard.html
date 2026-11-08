@@ -16,38 +16,70 @@
 
     <main class="conteudo">
       <header class="cabecalho-pagina">
-        <h1>Início</h1>
-        <p>O resumo do seu dia.</p>
+        <h1>
+          <span id="saudacao">Olá!</span>
+          <button id="botao-nome" class="botao-icone" type="button" title="Mudar como você é chamado(a)" aria-label="Mudar seu nome">✏️</button>
+        </h1>
+        <p id="data-hoje" class="data-hoje"></p>
       </header>
-      <div class="grade">
-        <section class="cartao">
-          <h2>Eventos de hoje</h2>
-          <p class="aviso-etapa">Aparecem aqui depois da etapa 4 (agenda).</p>
+
+      <div class="grade grade-inicio">
+        <section class="cartao cartao-resumo">
+          <div class="cartao-resumo-topo">
+            <h2>📅 Hoje na agenda</h2>
+            <a href="agenda.html">Abrir agenda</a>
+          </div>
+          <ul id="lista-eventos-hoje" class="lista-resumo">
+            <li class="vazio vazio-pequeno">Carregando...</li>
+          </ul>
         </section>
-        <section class="cartao">
-          <h2>Lembretes pendentes</h2>
-          <p class="aviso-etapa">Aparecem aqui depois da etapa 5.</p>
+
+        <section class="cartao cartao-resumo">
+          <div class="cartao-resumo-topo">
+            <h2>⏰ Lembretes de hoje</h2>
+            <a href="lembretes.html">Ver todos</a>
+          </div>
+          <ul id="lista-lembretes-hoje" class="lista-resumo">
+            <li class="vazio vazio-pequeno">Carregando...</li>
+          </ul>
+          <p id="mais-lembretes" class="aviso-etapa" hidden><a href="lembretes.html">Há mais lembretes para hoje →</a></p>
         </section>
-        <section class="cartao">
-          <h2>Notas fixadas</h2>
-          <p class="aviso-etapa">Aparecem aqui depois da etapa 5.</p>
+
+        <section class="cartao cartao-resumo">
+          <div class="cartao-resumo-topo">
+            <h2>📝 Notas fixadas</h2>
+            <a href="anotacoes.html">Abrir notas</a>
+          </div>
+          <ul id="lista-notas-fixadas" class="lista-resumo">
+            <li class="vazio vazio-pequeno">Carregando...</li>
+          </ul>
         </section>
-        <section class="cartao">
-          <h2>Finanças</h2>
-          <p class="aviso-etapa">Só no dashboard do Cardoso. Chega na etapa 8.</p>
+
+        <!-- Só aparece para quem tem can_see_finance; os dados virão da Pluggy (etapa 8) -->
+        <section id="cartao-financas" class="cartao cartao-resumo" hidden>
+          <div class="cartao-resumo-topo">
+            <h2>💰 Finanças</h2>
+            <a href="financas.html">Abrir</a>
+          </div>
+          <p class="aviso-etapa">Saldo e fatura aparecem aqui quando o banco for conectado (etapa 8).</p>
         </section>
       </div>
     </main>
   </div>
 
-  <!-- A ordem importa: biblioteca do Supabase, configuração, menu, sessão -->
+  <!-- A ordem importa: biblioteca, configuração, menu, notificações, sessão, funções, página -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/menu.js"></script>
   <script src="js/notificacoes.js"></script>
   <script src="js/sessao.js"></script>
+  <script src="js/lembretes.js"></script>
+  <script src="js/anotacoes.js"></script>
+  <script src="js/inicio.js"></script>
   <script>
-    protegerPagina();
+    protegerPagina().then((sessao) => {
+      if (sessao) iniciarInicio(sessao.usuario, sessao.perfil);
+    });
   </script>
 </body>
 </html>
