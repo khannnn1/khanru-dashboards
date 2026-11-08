@@ -862,8 +862,22 @@ h2 {
 }
 
 /* No mês, eventos com horário mostram só o nome (o horário aparece ao passar o mouse) */
-#calendario .fc-dayGridMonth-view .fc-daygrid-dot-event .fc-event-time {
+#calendario .fc-dayGridMonth-view .fc-event-time {
   display: none;
+}
+
+/* Dias com evento: fundo suave e faixa no topo com a cor do 1º evento do dia */
+#calendario .fc-daygrid-day.dia-com-evento {
+  background: color-mix(in srgb, var(--cor-dia) 16%, transparent);
+  box-shadow: inset 0 3px 0 var(--cor-dia);
+}
+
+#calendario .fc-daygrid-day.dia-com-evento:hover {
+  background: color-mix(in srgb, var(--cor-dia) 24%, transparent);
+}
+
+#calendario .fc-daygrid-day.dia-com-evento .fc-daygrid-day-number {
+  font-weight: 800;
 }
 
 #calendario .fc-daygrid-day-top {
@@ -906,8 +920,8 @@ h2 {
 
 #calendario .fc-daygrid-block-event,
 #calendario .fc-timegrid-event {
-  background: color-mix(in srgb, var(--cor-evento, var(--cor-destaque)) 20%, var(--cor-cartao));
-  border-left: 3px solid var(--cor-evento, var(--cor-destaque));
+  background: color-mix(in srgb, var(--cor-evento, var(--cor-destaque)) 32%, var(--cor-cartao));
+  border-left: 4px solid var(--cor-evento, var(--cor-destaque));
   box-shadow: none;
 }
 

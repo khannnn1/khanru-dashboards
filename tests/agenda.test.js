@@ -7,6 +7,7 @@ const {
   eventoParaFormulario,
   formularioParaLinha,
   linhaParaEvento,
+  coresPorDia,
   chaveDia,
   semanasDoMes,
   agruparPorDia,
@@ -124,4 +125,22 @@ test("agruparPorDia separa hoje, amanhã e outros dias, em ordem", () => {
   assert.deepStrictEqual(grupos[0].eventos.map((e) => e.id), ["viagem", "a", "a2"]);
   assert.match(grupos[2].rotulo, /10/);
   assert.strictEqual(grupos.length, 3);
+});
+
+test("coresPorDia pinta cada dia com a cor do primeiro evento", () => {
+  const d = (dia, hora = 0, min = 0) => new Date(2026, 10, dia, hora, min);
+  const mapa = coresPorDia([
+    { start: d(7, 20), end: d(7, 22), cor: "#3f8a5c" },
+    { start: d(7, 9), end: null, cor: null },
+    { start: d(10), end: d(13), cor: "#3d6fb0" }, // dia inteiro de 10 a 12 (fim exclusivo)
+    { start: d(14, 23), end: d(15, 1), cor: "#d0603f" }, // vira a noite
+  ]);
+  assert.strictEqual(mapa.get("2026-11-07"), null); // o das 9h vem primeiro e não tem cor
+  assert.deepStrictEqual(
+    ["2026-11-10", "2026-11-11", "2026-11-12"].map((k) => mapa.get(k)),
+    ["#3d6fb0", "#3d6fb0", "#3d6fb0"]
+  );
+  assert.strictEqual(mapa.has("2026-11-13"), false);
+  assert.strictEqual(mapa.get("2026-11-15"), "#d0603f");
+  assert.strictEqual(mapa.has("2026-11-08"), false);
 });
