@@ -11,25 +11,52 @@
   <div class="layout">
     <nav id="menu" class="menu" aria-label="Menu principal"></nav>
 
-    <main class="conteudo">
+    <main class="conteudo conteudo-largo">
       <header class="cabecalho-pagina">
         <h1>Anotações</h1>
-        <p>Suas notas, privadas por padrão.</p>
+        <p>Suas notas são privadas: só você vê. Tudo salva sozinho enquanto você escreve.</p>
       </header>
-        <section class="cartao">
-          <h2>Suas notas</h2>
-          <p class="aviso-etapa">As anotações chegam na etapa 5.</p>
+
+      <div id="pagina-notas" class="pagina-notas">
+        <section class="cartao painel-lista-notas" aria-label="Lista de notas">
+          <div class="barra-notas">
+            <input id="busca-notas" class="campo-busca" type="search" placeholder="Buscar nas notas" aria-label="Buscar nas notas">
+            <button id="botao-nova-nota" class="botao" type="button">+ Nova</button>
+          </div>
+          <ul id="lista-notas" class="lista-notas">
+            <li class="vazio">Carregando...</li>
+          </ul>
         </section>
+
+        <section id="editor-nota" class="cartao editor-nota" aria-label="Editor da nota" hidden>
+          <div class="barra-editor">
+            <button id="botao-voltar-notas" class="botao botao-secundario botao-voltar" type="button">← Notas</button>
+            <span id="estado-salvamento" class="estado-salvamento" role="status"></span>
+            <button id="botao-fixar" class="botao botao-secundario" type="button" aria-pressed="false">📌 Fixar no topo</button>
+            <button id="botao-apagar-nota" class="botao botao-perigo" type="button">Apagar</button>
+          </div>
+          <input id="nota-titulo" class="nota-titulo" type="text" maxlength="200" placeholder="Título" aria-label="Título da nota">
+          <textarea id="nota-conteudo" class="nota-conteudo" placeholder="Escreva aqui..." aria-label="Texto da nota"></textarea>
+        </section>
+
+        <section class="cartao editor-vazio" aria-hidden="true">
+          <p>Escolha uma nota ou crie uma nova.</p>
+        </section>
+      </div>
     </main>
   </div>
 
-  <!-- A ordem importa: biblioteca do Supabase, configuração, menu, sessão -->
+  <!-- A ordem importa: biblioteca, configuração, menu, notificações, sessão, página -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/menu.js"></script>
+  <script src="js/notificacoes.js"></script>
   <script src="js/sessao.js"></script>
+  <script src="js/anotacoes.js"></script>
   <script>
-    protegerPagina();
+    protegerPagina().then((sessao) => {
+      if (sessao) iniciarAnotacoes();
+    });
   </script>
 </body>
 </html>
