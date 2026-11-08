@@ -37,6 +37,9 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
 - `js/menu.js`: monta o menu lateral/inferior em todas as páginas.
 - `js/sessao.js`: cliente Supabase, `protegerPagina()` (redireciona quem não
   está logado, carrega o perfil, monta o menu) e o botão Sair.
+- `js/agenda.js`: FullCalendar 6.1.22 via CDN (a 7 mudou a API) ligado à
+  tabela `events`. Fim de evento de dia inteiro é exclusivo (padrão do
+  FullCalendar); o formulário mostra o último dia inclusivo.
 - `profiles.can_see_finance` só muda por SQL no painel: o grant de update
   cobre só `nome` e `tema`.
 - `supabase/`: `config.toml`, migrações (`migrations/`) e Edge Functions
