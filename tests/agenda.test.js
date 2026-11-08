@@ -7,6 +7,9 @@ const {
   eventoParaFormulario,
   formularioParaLinha,
   linhaParaEvento,
+  chaveDia,
+  semanasDoMes,
+  agruparPorDia,
 } = require("../js/agenda.js");
 
 // Datas criadas no horário local, igual ao que o navegador faz.
@@ -85,5 +88,40 @@ test("linhaParaEvento: evento meu é editável e usa a cor escolhida", () => {
   const evento = linhaParaEvento(linha, "eu");
   assert.strictEqual(evento.editable, true);
   assert.strictEqual(evento.title, "Academia");
-  assert.strictEqual(evento.backgroundColor, "#3f8a5c");
+  assert.strictEqual(evento.extendedProps.cor, "#3f8a5c");
+});
+
+test("chaveDia usa o dia local", () => {
+  assert.strictEqual(chaveDia(new Date(2026, 0, 5, 23, 59)), "2026-01-05");
+});
+
+test("semanasDoMes cobre o mês em 6 semanas começando no domingo", () => {
+  const semanas = semanasDoMes(2026, 10); // novembro de 2026 começa num domingo
+  assert.strictEqual(semanas.length, 6);
+  assert.ok(semanas.every((s) => s.length === 7));
+  assert.strictEqual(chaveDia(semanas[0][0]), "2026-11-01");
+  assert.ok(semanas.flat().every((d, i) => d.getDay() === i % 7));
+  const fev = semanasDoMes(2026, 1); // fevereiro de 2026 começa num domingo também
+  assert.strictEqual(chaveDia(fev[0][0]), "2026-02-01");
+  const out = semanasDoMes(2026, 9); // outubro de 2026 começa numa quinta
+  assert.strictEqual(chaveDia(out[0][0]), "2026-09-27");
+});
+
+test("agruparPorDia separa hoje, amanhã e outros dias, em ordem", () => {
+  const agora = new Date(2026, 10, 7, 15, 0);
+  const em = (dia, hora) => new Date(2026, 10, dia, hora).toISOString();
+  const grupos = agruparPorDia(
+    [
+      { id: "c", inicio: em(10, 9) },
+      { id: "a", inicio: em(7, 20) },
+      { id: "b", inicio: em(8, 8) },
+      { id: "viagem", inicio: em(5, 0) },
+      { id: "a2", inicio: em(7, 21) },
+    ],
+    agora
+  );
+  assert.deepStrictEqual(grupos.map((g) => g.rotulo).slice(0, 2), ["Hoje", "Amanhã"]);
+  assert.deepStrictEqual(grupos[0].eventos.map((e) => e.id), ["viagem", "a", "a2"]);
+  assert.match(grupos[2].rotulo, /10/);
+  assert.strictEqual(grupos.length, 3);
 });

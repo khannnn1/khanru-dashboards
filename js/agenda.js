@@ -101,11 +101,48 @@ function linhaParaEvento(linha, usuarioId) {
     classNames: meu ? [] : ["evento-parceiro"],
     extendedProps: { meu, shared: linha.shared, cor: linha.cor, tituloOriginal: linha.titulo },
   };
-  if (linha.cor) {
-    evento.backgroundColor = linha.cor;
-    evento.borderColor = linha.cor;
-  }
   return evento;
+}
+
+// "2026-11-07": chave de um dia no horário local (para marcar dias com evento).
+function chaveDia(data) {
+  return `${data.getFullYear()}-${doisDigitos(data.getMonth() + 1)}-${doisDigitos(data.getDate())}`;
+}
+
+// 6 semanas (domingo a sábado) que cobrem o mês, para o mini calendário.
+function semanasDoMes(ano, mes) {
+  const primeiro = new Date(ano, mes, 1);
+  const inicio = somarDias(primeiro, -primeiro.getDay());
+  const semanas = [];
+  for (let s = 0; s < 6; s++) {
+    const semana = [];
+    for (let d = 0; d < 7; d++) semana.push(somarDias(inicio, s * 7 + d));
+    semanas.push(semana);
+  }
+  return semanas;
+}
+
+// Agrupa os próximos eventos por dia: "Hoje", "Amanhã" ou "seg., 9 de nov.".
+function agruparPorDia(linhas, agora) {
+  const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+  const grupos = new Map();
+  const ordenadas = [...linhas].sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+  for (const linha of ordenadas) {
+    const inicio = new Date(linha.inicio);
+    // Evento que começou antes de hoje (ex.: viagem) aparece em "Hoje".
+    const dia = inicio < hoje ? hoje : new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate());
+    const chave = chaveDia(dia);
+    if (!grupos.has(chave)) {
+      const diferenca = Math.round((dia - hoje) / 86400000);
+      const rotulo =
+        diferenca === 0 ? "Hoje"
+        : diferenca === 1 ? "Amanhã"
+        : dia.toLocaleDateString("pt-BR", { weekday: "short", day: "numeric", month: "short" });
+      grupos.set(chave, { rotulo, eventos: [] });
+    }
+    grupos.get(chave).eventos.push(linha);
+  }
+  return [...grupos.values()];
 }
 
 // ---------- Parte que roda no navegador ----------
@@ -122,19 +159,37 @@ async function iniciarAgenda(usuario) {
   montarSeletorDeCores(document.getElementById("cores-evento"));
 
   const celular = window.matchMedia("(max-width: 720px)").matches;
+  const tituloPeriodo = document.getElementById("titulo-periodo");
+  const seletorVisao = document.getElementById("seletor-visao");
+  const diasComEvento = new Set();
+  let mesDoMini = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
   const calendario = new FullCalendar.Calendar(document.getElementById("calendario"), {
     locale: "pt-br",
     initialView: celular ? "listWeek" : "dayGridMonth",
+    headerToolbar: false, // usamos o nosso próprio cabeçalho (mais bonito)
     height: "auto",
     nowIndicator: true,
     selectable: true,
     editable: true,
     dayMaxEvents: 3,
-    headerToolbar: celular
-      ? { left: "prev,next", center: "title", right: "today" }
-      : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek" },
-    footerToolbar: celular ? { center: "dayGridMonth,timeGridDay,listWeek" } : undefined,
+    moreLinkContent: (info) => `+${info.num} mais`,
+    allDayText: "Dia todo",
+    slotMinTime: "06:00:00",
+    scrollTime: "08:00:00",
+    slotLabelFormat: { hour: "2-digit", minute: "2-digit" },
+    eventTimeFormat: { hour: "2-digit", minute: "2-digit" },
+    fixedWeekCount: false,
+    listDayFormat: { weekday: "long", day: "numeric", month: "long" },
+    listDaySideFormat: false,
+    noEventsContent: "Nada marcado neste período.",
+
+    // Na semana e no dia, o cabeçalho mostra "seg." em cima e o número embaixo.
+    dayHeaderContent: (info) => {
+      if (info.view.type !== "timeGridWeek" && info.view.type !== "timeGridDay") return info.text;
+      const semana = info.date.toLocaleDateString("pt-BR", { weekday: "short" });
+      return { html: `<span class="cab-dia-semana">${semana}</span><span class="cab-dia-numero">${info.date.getDate()}</span>` };
+    },
 
     // Busca no banco só os eventos do período que está na tela.
     events: async (periodo) => {
@@ -151,6 +206,49 @@ async function iniciarAgenda(usuario) {
         return [];
       }
       return data.map((linha) => linhaParaEvento(linha, usuario.id));
+    },
+
+    // Cada evento recebe a sua cor numa variável CSS; o CSS desenha a
+    // "pílula" com fundo suave e uma barrinha forte na esquerda.
+    eventDidMount: (info) => {
+      info.el.style.setProperty("--cor-evento", info.event.extendedProps.cor || "var(--cor-destaque)");
+      // Passar o mouse mostra o nome inteiro e o horário (no mês o nome pode ser cortado).
+      const hora = info.event.allDay
+        ? "Dia todo"
+        : info.event.start.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      info.el.title = `${info.event.extendedProps.tituloOriginal} · ${hora}`;
+    },
+
+    // Guarda quais dias têm evento, para as bolinhas do mini calendário.
+    eventsSet: (eventos) => {
+      diasComEvento.clear();
+      for (const evento of eventos) {
+        let dia = new Date(evento.start);
+        const fim = evento.end || evento.start;
+        do {
+          diasComEvento.add(chaveDia(dia));
+          dia = somarDias(dia, 1);
+        } while (dia < fim);
+      }
+      desenharMiniCalendario();
+    },
+
+    // Mudou de mês/semana/visão: atualiza o título e o mini calendário.
+    datesSet: (info) => {
+      // Semana e dia ficam com altura fixa e rolagem (começando às 8h);
+      // mês e lista crescem conforme o conteúdo.
+      const altura = info.view.type.startsWith("timeGrid") ? 760 : "auto";
+      if (calendario.getOption("height") !== altura) {
+        calendario.setOption("height", altura);
+        if (altura !== "auto") setTimeout(() => calendario.scrollToTime("08:00:00"), 0);
+      }
+      tituloPeriodo.textContent = info.view.title;
+      seletorVisao.querySelectorAll("button").forEach((botao) => {
+        botao.setAttribute("aria-pressed", String(botao.dataset.visao === info.view.type));
+      });
+      const meio = new Date((info.start.getTime() + info.end.getTime()) / 2);
+      mesDoMini = new Date(meio.getFullYear(), meio.getMonth(), 1);
+      desenharMiniCalendario();
     },
 
     // Selecionar um dia (ou arrastar sobre horários) cria um evento.
@@ -172,7 +270,132 @@ async function iniciarAgenda(usuario) {
     eventResize: (info) => salvarNovaData(info),
   });
 
+  // ----- Cabeçalho próprio -----
+  document.getElementById("botao-anterior").addEventListener("click", () => calendario.prev());
+  document.getElementById("botao-proximo").addEventListener("click", () => calendario.next());
+  document.getElementById("botao-hoje").addEventListener("click", () => calendario.today());
+  seletorVisao.addEventListener("click", (evento) => {
+    const botao = evento.target.closest("button[data-visao]");
+    if (botao) calendario.changeView(botao.dataset.visao);
+  });
+
+  document.getElementById("botao-novo-evento").addEventListener("click", () => {
+    // Começa na próxima hora cheia, com 1 hora de duração.
+    const inicio = new Date();
+    inicio.setMinutes(0, 0, 0);
+    inicio.setHours(inicio.getHours() + 1);
+    abrirDialogo(null, { title: "", start: inicio, end: new Date(inicio.getTime() + 3600000), allDay: false, extendedProps: {} });
+  });
+
+  // ----- Mini calendário -----
+  const mini = document.getElementById("mini-calendario");
+
+  function desenharMiniCalendario() {
+    if (!mini) return;
+    const hoje = chaveDia(new Date());
+    const visao = calendario.view;
+    mini.querySelector(".mini-titulo").textContent = mesDoMini.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+
+    const corpo = mini.querySelector("tbody");
+    corpo.innerHTML = "";
+    for (const semana of semanasDoMes(mesDoMini.getFullYear(), mesDoMini.getMonth())) {
+      const linha = document.createElement("tr");
+      for (const dia of semana) {
+        const celula = document.createElement("td");
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.textContent = dia.getDate();
+        botao.className = "mini-dia";
+        const chave = chaveDia(dia);
+        if (dia.getMonth() !== mesDoMini.getMonth()) botao.classList.add("fora-do-mes");
+        if (chave === hoje) botao.classList.add("hoje");
+        if (diasComEvento.has(chave)) botao.classList.add("tem-evento");
+        if (visao && visao.type !== "dayGridMonth" && dia >= visao.currentStart && dia < visao.currentEnd) {
+          botao.classList.add("no-periodo");
+        }
+        botao.setAttribute("aria-label", dia.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" }));
+        botao.addEventListener("click", () => {
+          if (calendario.view.type === "dayGridMonth") calendario.changeView("timeGridDay", dia);
+          else calendario.gotoDate(dia);
+        });
+        celula.appendChild(botao);
+        linha.appendChild(celula);
+      }
+      corpo.appendChild(linha);
+    }
+  }
+
+  mini.querySelector(".mini-anterior").addEventListener("click", () => {
+    mesDoMini = new Date(mesDoMini.getFullYear(), mesDoMini.getMonth() - 1, 1);
+    desenharMiniCalendario();
+  });
+  mini.querySelector(".mini-proximo").addEventListener("click", () => {
+    mesDoMini = new Date(mesDoMini.getFullYear(), mesDoMini.getMonth() + 1, 1);
+    desenharMiniCalendario();
+  });
+
+  // ----- Próximos dias -----
+  const listaProximos = document.getElementById("lista-proximos");
+
+  async function carregarProximos() {
+    const agora = new Date();
+    const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+    const limite = somarDias(hoje, 14);
+    const { data, error } = await banco
+      .from("events")
+      .select("id, owner_id, titulo, inicio, fim, dia_inteiro, cor, shared")
+      .lt("inicio", limite.toISOString())
+      .or(`fim.gt.${agora.toISOString()},and(fim.is.null,inicio.gte.${hoje.toISOString()})`)
+      .order("inicio")
+      .limit(30);
+    if (error) {
+      listaProximos.innerHTML = `<li class="vazio vazio-pequeno">Não foi possível carregar.</li>`;
+      return;
+    }
+    const grupos = agruparPorDia(data, agora).slice(0, 6);
+    if (grupos.length === 0) {
+      listaProximos.innerHTML = `<li class="vazio vazio-pequeno">Nada nos próximos 14 dias.</li>`;
+      return;
+    }
+    listaProximos.innerHTML = "";
+    for (const grupo of grupos) {
+      const item = document.createElement("li");
+      const rotulo = document.createElement("span");
+      rotulo.className = "proximos-dia";
+      rotulo.textContent = grupo.rotulo;
+      const eventos = document.createElement("ul");
+      for (const linha of grupo.eventos) {
+        const meu = linha.owner_id === usuario.id;
+        const ev = document.createElement("li");
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "proximo-evento" + (meu ? "" : " do-par");
+        botao.style.setProperty("--cor-evento", linha.cor || "var(--cor-destaque)");
+        const nome = document.createElement("span");
+        nome.className = "proximo-nome";
+        nome.textContent = meu ? linha.titulo : `💞 ${linha.titulo}`; // textContent: nunca vira HTML
+        const hora = document.createElement("span");
+        hora.className = "proximo-hora";
+        hora.textContent = linha.dia_inteiro
+          ? "Dia todo"
+          : new Date(linha.inicio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        botao.append(nome, hora);
+        botao.addEventListener("click", () => calendario.changeView("timeGridDay", new Date(linha.inicio)));
+        ev.appendChild(botao);
+        eventos.appendChild(ev);
+      }
+      item.append(rotulo, eventos);
+      listaProximos.appendChild(item);
+    }
+  }
+
+  function atualizarTudo() {
+    calendario.refetchEvents();
+    carregarProximos();
+  }
+
   calendario.render();
+  carregarProximos();
 
   async function salvarNovaData(info) {
     const { error } = await banco
@@ -186,7 +409,9 @@ async function iniciarAgenda(usuario) {
     if (error) {
       info.revert();
       mostrarErroGeral("Não foi possível mudar a data.", error);
+      return;
     }
+    carregarProximos();
   }
 
   function abrirDialogo(evento, rascunho) {
@@ -262,7 +487,7 @@ async function iniciarAgenda(usuario) {
       return;
     }
     dialogo.close();
-    calendario.refetchEvents();
+    atualizarTudo();
   });
 
   botaoApagar.addEventListener("click", async () => {
@@ -275,7 +500,7 @@ async function iniciarAgenda(usuario) {
       return;
     }
     dialogo.close();
-    calendario.refetchEvents();
+    atualizarTudo();
   });
 
   document.getElementById("botao-cancelar").addEventListener("click", () => dialogo.close());
@@ -319,5 +544,8 @@ if (typeof module !== "undefined") {
     eventoParaFormulario,
     formularioParaLinha,
     linhaParaEvento,
+    chaveDia,
+    semanasDoMes,
+    agruparPorDia,
   };
 }
