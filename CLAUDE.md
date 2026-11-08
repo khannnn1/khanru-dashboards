@@ -40,6 +40,14 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
 - `js/agenda.js`: FullCalendar 6.1.22 via CDN (a 7 mudou a API) ligado à
   tabela `events`. Fim de evento de dia inteiro é exclusivo (padrão do
   FullCalendar); o formulário mostra o último dia inclusivo.
+- `js/lembretes.js`: abas hoje (inclui atrasados) / próximos (inclui sem
+  data) / feitos. `js/notificacoes.js`: avisa lembretes na hora, em qualquer
+  página aberta (carregar antes do sessao.js).
+- `js/anotacoes.js`: lista + editor com salvamento automático (debounce de
+  800 ms via `comAtraso`).
+- Para testar páginas sem login: criar um `teste-*.html` temporário com um
+  Supabase falso e apagar depois (nunca commitar).
+- Site publicado: https://khannnn1.github.io/khanru-dashboards/ (branch `main`).
 - `profiles.can_see_finance` só muda por SQL no painel: o grant de update
   cobre só `nome` e `tema`.
 - `supabase/`: `config.toml`, migrações (`migrations/`) e Edge Functions

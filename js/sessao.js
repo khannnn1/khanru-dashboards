@@ -87,6 +87,9 @@ async function protegerPagina() {
     if (evento === "SIGNED_OUT") location.replace(PAGINA_LOGIN);
   });
 
+  // Avisos de lembretes em qualquer página (se o notificacoes.js foi carregado).
+  if (typeof iniciarNotificacoes === "function") iniciarNotificacoes(sessao.user);
+
   document.documentElement.classList.remove("carregando");
   return { usuario: sessao.user, perfil };
 }
