@@ -109,6 +109,24 @@ function chaveDia(data) {
   return `${data.getFullYear()}-${doisDigitos(data.getMonth() + 1)}-${doisDigitos(data.getDate())}`;
 }
 
+// Para cada dia com evento, a cor que vai pintar a célula: a do primeiro
+// evento do dia (eventos sem cor usam null = cor de destaque do tema).
+// Recebe objetos com start, end (Date ou null) e cor.
+function coresPorDia(eventos) {
+  const mapa = new Map();
+  const ordenados = [...eventos].sort((a, b) => a.start - b.start);
+  for (const evento of ordenados) {
+    const fim = evento.end || evento.start;
+    let dia = new Date(evento.start.getFullYear(), evento.start.getMonth(), evento.start.getDate());
+    do {
+      const chave = chaveDia(dia);
+      if (!mapa.has(chave)) mapa.set(chave, evento.cor || null);
+      dia = somarDias(dia, 1);
+    } while (dia < fim);
+  }
+  return mapa;
+}
+
 // 6 semanas (domingo a sábado) que cobrem o mês, para o mini calendário.
 function semanasDoMes(ano, mes) {
   const primeiro = new Date(ano, mes, 1);
@@ -161,7 +179,7 @@ async function iniciarAgenda(usuario) {
   const celular = window.matchMedia("(max-width: 720px)").matches;
   const tituloPeriodo = document.getElementById("titulo-periodo");
   const seletorVisao = document.getElementById("seletor-visao");
-  const diasComEvento = new Set();
+  let diasComEvento = new Map(); // "2026-11-07" -> cor do primeiro evento
   let mesDoMini = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
   const calendario = new FullCalendar.Calendar(document.getElementById("calendario"), {
@@ -173,6 +191,7 @@ async function iniciarAgenda(usuario) {
     selectable: true,
     editable: true,
     dayMaxEvents: 3,
+    eventDisplay: "block", // todo evento vira "pílula" colorida, inclusive os com horário
     moreLinkContent: (info) => `+${info.num} mais`,
     allDayText: "Dia todo",
     slotMinTime: "06:00:00",
@@ -219,19 +238,18 @@ async function iniciarAgenda(usuario) {
       info.el.title = `${info.event.extendedProps.tituloOriginal} · ${hora}`;
     },
 
-    // Guarda quais dias têm evento, para as bolinhas do mini calendário.
+    // Guarda quais dias têm evento: pinta essas células e põe as bolinhas
+    // no mini calendário.
     eventsSet: (eventos) => {
-      diasComEvento.clear();
-      for (const evento of eventos) {
-        let dia = new Date(evento.start);
-        const fim = evento.end || evento.start;
-        do {
-          diasComEvento.add(chaveDia(dia));
-          dia = somarDias(dia, 1);
-        } while (dia < fim);
-      }
+      diasComEvento = coresPorDia(
+        eventos.map((e) => ({ start: e.start, end: e.end, cor: e.extendedProps.cor }))
+      );
+      document.querySelectorAll("#calendario .fc-daygrid-day[data-date]").forEach(pintarDia);
       desenharMiniCalendario();
     },
+
+    // Quando o calendário redesenha uma célula (ex.: trocou de mês), pinta de novo.
+    dayCellDidMount: (info) => pintarDia(info.el),
 
     // Mudou de mês/semana/visão: atualiza o título e o mini calendário.
     datesSet: (info) => {
@@ -269,6 +287,19 @@ async function iniciarAgenda(usuario) {
     eventDrop: (info) => salvarNovaData(info),
     eventResize: (info) => salvarNovaData(info),
   });
+
+  // Dia com evento: a célula ganha um fundo suave e uma faixa da cor do evento.
+  function pintarDia(celula) {
+    const chave = celula.dataset.date;
+    if (!chave) return;
+    if (diasComEvento.has(chave)) {
+      celula.classList.add("dia-com-evento");
+      celula.style.setProperty("--cor-dia", diasComEvento.get(chave) || "var(--cor-destaque)");
+    } else {
+      celula.classList.remove("dia-com-evento");
+      celula.style.removeProperty("--cor-dia");
+    }
+  }
 
   // ----- Cabeçalho próprio -----
   document.getElementById("botao-anterior").addEventListener("click", () => calendario.prev());
@@ -544,6 +575,7 @@ if (typeof module !== "undefined") {
     eventoParaFormulario,
     formularioParaLinha,
     linhaParaEvento,
+    coresPorDia,
     chaveDia,
     semanasDoMes,
     agruparPorDia,
