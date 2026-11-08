@@ -17,6 +17,13 @@
   --cor-perigo: #b3261e;
   --sombra: 0 6px 18px rgba(120, 70, 60, 0.12);
 
+  /* Texto e campos de cada superfície. Nos temas prontos são iguais;
+     no modo Personalizado o tema.js calcula um para cada superfície. */
+  --cor-texto-cartao: var(--cor-texto);
+  --cor-texto-suave-cartao: var(--cor-texto-suave);
+  --cor-texto-menu: var(--cor-texto);
+  --cor-texto-suave-menu: var(--cor-texto-suave);
+
   --raio: 14px;
   --largura-menu: 220px;
   --altura-menu-celular: 64px;
@@ -44,6 +51,33 @@
   box-sizing: border-box;
 }
 
+/* ---------- Superfícies ----------
+   Cada superfície troca as variáveis de texto para as dela, e todo o
+   conteúdo de dentro herda. Assim um painel escuro sobre um fundo claro
+   (modo Personalizado) continua legível. */
+:root {
+  --cor-campo: color-mix(in srgb, var(--cor-texto) 7%, var(--cor-fundo));
+}
+
+.cartao,
+.dialogo,
+.item-lembrete,
+.abas button,
+.abas-modo span,
+.aviso-erro {
+  --cor-texto: var(--cor-texto-cartao);
+  --cor-texto-suave: var(--cor-texto-suave-cartao);
+  --cor-campo: color-mix(in srgb, var(--cor-texto-cartao) 7%, var(--cor-cartao));
+  color: var(--cor-texto);
+}
+
+.menu {
+  --cor-texto: var(--cor-texto-menu);
+  --cor-texto-suave: var(--cor-texto-suave-menu);
+  --cor-campo: color-mix(in srgb, var(--cor-texto-menu) 9%, var(--cor-menu));
+  color: var(--cor-texto);
+}
+
 /* Garante que o atributo hidden sempre esconda, mesmo em botões */
 [hidden] {
   display: none !important;
@@ -53,6 +87,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background: var(--cor-fundo);
+  background-image: var(--fundo-imagem, none);
+  background-attachment: fixed;
   color: var(--cor-texto);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
@@ -88,6 +124,7 @@ h2 {
 
 .cabecalho-pagina {
   margin-bottom: 24px;
+  text-shadow: var(--sombra-texto-fundo, none);
 }
 
 .cabecalho-pagina p {
@@ -135,7 +172,7 @@ h2 {
 }
 
 .menu-link:hover {
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
 }
 
 .menu-link[aria-current="page"] {
@@ -265,7 +302,7 @@ h2 {
 }
 
 .botao-secundario:hover {
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
 }
 
 /* ---------- Login ---------- */
@@ -303,7 +340,7 @@ h2 {
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--cor-borda);
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
 }
 
 .campo input:focus {
@@ -458,8 +495,8 @@ h2 {
 #calendario {
   --fc-border-color: var(--cor-borda);
   --fc-page-bg-color: var(--cor-cartao);
-  --fc-neutral-bg-color: var(--cor-fundo);
-  --fc-list-event-hover-bg-color: var(--cor-fundo);
+  --fc-neutral-bg-color: var(--cor-campo);
+  --fc-list-event-hover-bg-color: var(--cor-campo);
   --fc-today-bg-color: color-mix(in srgb, var(--cor-realce) 45%, transparent);
   --fc-event-bg-color: var(--cor-destaque);
   --fc-event-border-color: var(--cor-destaque);
@@ -467,7 +504,7 @@ h2 {
   --fc-button-bg-color: var(--cor-cartao);
   --fc-button-border-color: var(--cor-borda);
   --fc-button-text-color: var(--cor-texto);
-  --fc-button-hover-bg-color: var(--cor-fundo);
+  --fc-button-hover-bg-color: var(--cor-campo);
   --fc-button-hover-border-color: var(--cor-borda);
   --fc-button-active-bg-color: var(--cor-destaque);
   --fc-button-active-border-color: var(--cor-destaque);
@@ -545,7 +582,7 @@ h2 {
 
 .botao-icone:hover {
   opacity: 1;
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
 }
 
 /* ---------- Abas ---------- */
@@ -675,7 +712,7 @@ h2 {
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--cor-borda);
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
 }
 
 .lista-notas {
@@ -700,11 +737,11 @@ h2 {
 }
 
 .item-nota:hover {
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
 }
 
 .item-nota[aria-current="true"] {
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
   box-shadow: inset 3px 0 0 var(--cor-destaque);
 }
 
@@ -911,7 +948,7 @@ h2 {
   padding: 2px;
   border: 1px solid var(--cor-borda);
   border-radius: 10px;
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
   cursor: pointer;
 }
 
@@ -933,7 +970,7 @@ h2 {
   gap: 14px;
   padding: 14px;
   border-radius: 12px;
-  background: var(--cor-fundo);
+  background: var(--cor-campo);
   border: 1px solid var(--cor-borda);
   margin-bottom: 12px;
 }
@@ -1025,4 +1062,58 @@ h2 {
 .vazio-pequeno {
   padding: 12px 0;
   text-align: left;
+}
+
+/* Cores livres (modo Personalizado) */
+.grade-cores-livres {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cor-livre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.cor-livre label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.cor-livre input[type="color"] {
+  width: 44px;
+  height: 36px;
+  flex-shrink: 0;
+  padding: 2px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  background: var(--cor-campo);
+  cursor: pointer;
+}
+
+.cor-livre input[type="color"]:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cor-livre input[type="checkbox"] {
+  accent-color: var(--cor-destaque);
+}
+
+.form-cores .aviso-etapa {
+  margin: 0;
+}
+
+.dialogo {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
 }
