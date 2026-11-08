@@ -507,3 +507,298 @@ h2 {
     gap: 8px;
   }
 }
+
+/* ---------- Cabeçalho com botão ---------- */
+.cabecalho-com-acao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mensagem-esquerda {
+  text-align: left;
+}
+
+.vazio {
+  list-style: none;
+  color: var(--cor-texto-suave);
+  padding: 24px 8px;
+  text-align: center;
+}
+
+.botao-icone {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 6px;
+  border-radius: 8px;
+  opacity: 0.7;
+}
+
+.botao-icone:hover {
+  opacity: 1;
+  background: var(--cor-fundo);
+}
+
+/* ---------- Abas ---------- */
+.abas {
+  display: flex;
+  gap: 6px;
+  margin: 24px 0 12px;
+  flex-wrap: wrap;
+}
+
+.abas button {
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-cartao);
+  color: var(--cor-texto);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.abas button[aria-selected="true"] {
+  background: var(--cor-destaque);
+  border-color: var(--cor-destaque);
+  color: var(--cor-texto-no-destaque);
+  font-weight: 600;
+}
+
+/* ---------- Lembretes ---------- */
+.form-lembrete {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.form-lembrete .campo {
+  margin-bottom: 0;
+}
+
+.form-lembrete .campo-check {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+@media (max-width: 720px) {
+  .form-lembrete {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lista-lembretes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-lembrete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--cor-cartao);
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.item-lembrete input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--cor-destaque);
+  cursor: pointer;
+}
+
+.item-lembrete-textos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.item-lembrete-texto {
+  overflow-wrap: anywhere;
+}
+
+.item-lembrete-detalhes {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+}
+
+.item-lembrete.atrasado {
+  border-left: 4px solid var(--cor-perigo);
+}
+
+.item-lembrete.atrasado .item-lembrete-detalhes {
+  color: var(--cor-perigo);
+}
+
+.item-lembrete.feito .item-lembrete-texto {
+  text-decoration: line-through;
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Anotações ---------- */
+.pagina-notas {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.painel-lista-notas {
+  padding: 12px;
+}
+
+.barra-notas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.campo-busca {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-fundo);
+}
+
+.lista-notas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.item-nota {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-nota:hover {
+  background: var(--cor-fundo);
+}
+
+.item-nota[aria-current="true"] {
+  background: var(--cor-fundo);
+  box-shadow: inset 3px 0 0 var(--cor-destaque);
+}
+
+.item-nota strong,
+.item-nota span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-nota span {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+}
+
+.editor-nota {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 65vh;
+}
+
+.barra-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.estado-salvamento {
+  margin-right: auto;
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+}
+
+.botao-voltar {
+  display: none;
+}
+
+.nota-titulo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.nota-conteudo {
+  flex: 1;
+  min-height: 40vh;
+  resize: vertical;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  line-height: 1.6;
+}
+
+.nota-titulo:focus,
+.nota-conteudo:focus {
+  outline: none;
+}
+
+.editor-vazio {
+  display: grid;
+  place-items: center;
+  min-height: 65vh;
+  color: var(--cor-texto-suave);
+}
+
+.editor-nota:not([hidden]) ~ .editor-vazio {
+  display: none;
+}
+
+/* No celular: ou a lista, ou o editor */
+@media (max-width: 720px) {
+  .pagina-notas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor-vazio {
+    display: none;
+  }
+
+  .pagina-notas.editando .painel-lista-notas {
+    display: none;
+  }
+
+  .botao-voltar {
+    display: inline-block;
+  }
+
+  .editor-nota {
+    min-height: 0;
+  }
+}
+
+.mensagem-esquerda:empty {
+  margin: 0;
+  min-height: 0;
+}

@@ -12,24 +12,58 @@
     <nav id="menu" class="menu" aria-label="Menu principal"></nav>
 
     <main class="conteudo">
-      <header class="cabecalho-pagina">
-        <h1>Lembretes</h1>
-        <p>Coisas para não esquecer.</p>
+      <header class="cabecalho-pagina cabecalho-com-acao">
+        <div>
+          <h1>Lembretes</h1>
+          <p>Coisas para não esquecer. 💞 marca os lembretes que seu par compartilhou.</p>
+        </div>
+        <button id="botao-notificacoes" class="botao botao-secundario" type="button" hidden>🔔 Ativar notificações</button>
       </header>
-        <section class="cartao">
-          <h2>Seus lembretes</h2>
-          <p class="aviso-etapa">A lista de lembretes chega na etapa 5.</p>
-        </section>
+
+      <section class="cartao">
+        <form id="form-lembrete" class="form-lembrete" novalidate>
+          <label class="campo campo-texto-lembrete">
+            <span>Novo lembrete</span>
+            <input name="texto" type="text" maxlength="500" placeholder="Ex.: comprar pão" required>
+          </label>
+          <label class="campo">
+            <span>Quando (opcional)</span>
+            <input name="quando" type="datetime-local">
+          </label>
+          <button class="botao" type="submit">Adicionar</button>
+          <label class="campo-check">
+            <input name="compartilhar" type="checkbox">
+            <span>Compartilhar com meu par</span>
+          </label>
+        </form>
+        <p id="mensagem-lembrete" class="mensagem mensagem-esquerda" role="status"></p>
+      </section>
+
+      <div id="abas-lembretes" class="abas" role="tablist" aria-label="Filtrar lembretes">
+        <button type="button" role="tab" data-aba="hoje" aria-selected="true">Hoje</button>
+        <button type="button" role="tab" data-aba="proximos" aria-selected="false">Próximos</button>
+        <button type="button" role="tab" data-aba="feitos" aria-selected="false">Feitos</button>
+      </div>
+
+      <ul id="lista-lembretes" class="lista-lembretes" aria-live="polite">
+        <li class="vazio">Carregando...</li>
+      </ul>
     </main>
   </div>
 
-  <!-- A ordem importa: biblioteca do Supabase, configuração, menu, sessão -->
+  <!-- A ordem importa: biblioteca, configuração, menu, notificações, sessão, página -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/menu.js"></script>
+  <script src="js/notificacoes.js"></script>
   <script src="js/sessao.js"></script>
+  <script src="js/lembretes.js"></script>
   <script>
-    protegerPagina();
+    protegerPagina().then((sessao) => {
+      if (!sessao) return;
+      prepararBotaoNotificacoes(document.getElementById("botao-notificacoes"), sessao.usuario);
+      iniciarLembretes(sessao.usuario);
+    });
   </script>
 </body>
 </html>
