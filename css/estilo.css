@@ -949,3 +949,80 @@ h2 {
 .form-cores .botoes-dialogo .estado-salvamento {
   margin-right: auto;
 }
+
+/* ---------- Tela inicial ---------- */
+.cabecalho-pagina h1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.data-hoje::first-letter {
+  text-transform: uppercase;
+}
+
+.grade-inicio {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: start;
+}
+
+.cartao-resumo-topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cartao-resumo-topo h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.cartao-resumo-topo a {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.lista-resumo {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item-resumo {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.item-resumo:last-child {
+  border-bottom: none;
+}
+
+.item-resumo-principal {
+  overflow-wrap: anywhere;
+}
+
+.item-resumo-detalhe {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-resumo.com-cor {
+  border-left: 4px solid var(--cor-item);
+  padding-left: 10px;
+}
+
+.item-resumo.atrasado .item-resumo-detalhe {
+  color: var(--cor-perigo);
+}
+
+.vazio-pequeno {
+  padding: 12px 0;
+  text-align: left;
+}
