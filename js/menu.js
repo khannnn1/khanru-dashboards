@@ -40,6 +40,10 @@ function montarMenu(nav, paginaAtual, podeVerFinancas) {
   nav.innerHTML = `
     <a class="menu-logo" href="dashboard.html">Khanru 💞</a>
     <ul class="menu-lista">${itens}</ul>
+    <button id="botao-cores" class="menu-link menu-cores" type="button">
+      <span class="menu-icone" aria-hidden="true">🎨</span>
+      <span>Cores</span>
+    </button>
     <button id="botao-sair" class="menu-link menu-sair" type="button">
       <span class="menu-icone" aria-hidden="true">🚪</span>
       <span>Sair</span>

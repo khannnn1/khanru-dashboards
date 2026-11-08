@@ -87,6 +87,9 @@ async function protegerPagina() {
     if (evento === "SIGNED_OUT") location.replace(PAGINA_LOGIN);
   });
 
+  // Tema de cores do perfil + botão 🎨 do menu (se o tema.js foi carregado).
+  if (typeof iniciarPersonalizacao === "function") iniciarPersonalizacao(perfil);
+
   // Avisos de lembretes em qualquer página (se o notificacoes.js foi carregado).
   if (typeof iniciarNotificacoes === "function") iniciarNotificacoes(sessao.user);
 

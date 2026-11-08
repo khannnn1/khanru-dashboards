@@ -45,6 +45,11 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
   página aberta (carregar antes do sessao.js).
 - `js/anotacoes.js`: lista + editor com salvamento automático (debounce de
   800 ms via `comAtraso`).
+- `js/tema.js`: carregado no `<head>` de todas as páginas. 6 paletas
+  (claro/escuro), modo auto/claro/escuro e destaque livre. Aplica as
+  variáveis CSS inline; salva em `localStorage` e em `profiles.tema` (o
+  perfil vence). O teste `tests/tema.test.js` exige contraste mínimo em
+  todas as paletas: paleta nova precisa passar nele.
 - Para testar páginas sem login: criar um `teste-*.html` temporário com um
   Supabase falso e apagar depois (nunca commitar).
 - Site publicado: https://khannnn1.github.io/khanru-dashboards/ (branch `main`).
