@@ -40,7 +40,7 @@ const PALETAS = {
 };
 
 const TEMA_PADRAO = { paleta: "rosa", modo: "auto", destaque: null };
-const MODOS = ["auto", "claro", "escuro"];
+const MODOS = ["auto", "claro", "escuro", "personalizado"];
 
 // ---------- Funções puras (testadas em tests/tema.test.js) ----------
 
@@ -82,38 +82,130 @@ function corDeTextoSobre(hex) {
   return contraste(hex, "#ffffff") >= contraste(hex, escuro) ? "#ffffff" : escuro;
 }
 
+// Mistura duas cores: peso 1 = só a primeira, 0 = só a segunda.
+function misturar(hexA, hexB, peso) {
+  const a = hexParaRgb(hexA);
+  const b = hexParaRgb(hexB);
+  return rgbParaHex(a.map((c, i) => c * peso + b[i] * (1 - peso)));
+}
+
+const TEXTO_CLARO = "#f7f2ef";
+const TEXTO_ESCURO = "#1f1a1c";
+
+// Cor de texto para uma ou mais cores de fundo (ex.: as duas do degradê):
+// fica com a opção cujo PIOR contraste é o maior.
+// Prefere os tons suaves; se não chegarem a 4.5:1 (cores "do meio", como um
+// rosa forte), usa branco ou preto puros, que sempre passam numa cor só.
+function piorContraste(texto, fundos) {
+  return Math.min(...fundos.map((f) => contraste(texto, f)));
+}
+
+function textoParaFundos(fundos) {
+  const suave = piorContraste(TEXTO_CLARO, fundos) >= piorContraste(TEXTO_ESCURO, fundos) ? TEXTO_CLARO : TEXTO_ESCURO;
+  if (piorContraste(suave, fundos) >= 4.5) return suave;
+  return piorContraste("#ffffff", fundos) >= piorContraste("#000000", fundos) ? "#ffffff" : "#000000";
+}
+
+// Texto "suave" (mais apagado), mas que ainda passe 4.5:1 em todos os fundos.
+function textoSuaveParaFundos(texto, fundos) {
+  for (let passo = 0; passo <= 10; passo++) {
+    const suave = misturar(texto, fundos[0], 0.6 + passo * 0.04);
+    if (fundos.every((f) => contraste(suave, f) >= 4.5)) return suave;
+  }
+  return texto;
+}
+
+// Cores do modo Personalizado: começa com o Rosa escuro.
+const PERSONALIZADO_PADRAO = { fundo: "#241b1d", fundo2: null, menu: "#2c2123", cartao: "#332628" };
+
 // Aceita qualquer coisa (do localStorage ou do banco) e devolve um tema válido.
 function normalizarTema(tema) {
   const t = tema && typeof tema === "object" ? tema : {};
+  const p = t.personalizado && typeof t.personalizado === "object" ? t.personalizado : {};
+  const cor = (valor, padrao) => (ehHexValido(valor) ? valor.toLowerCase() : padrao);
   return {
     paleta: Object.prototype.hasOwnProperty.call(PALETAS, t.paleta) ? t.paleta : TEMA_PADRAO.paleta,
     modo: MODOS.includes(t.modo) ? t.modo : TEMA_PADRAO.modo,
-    destaque: ehHexValido(t.destaque) ? t.destaque.toLowerCase() : null,
+    destaque: cor(t.destaque, null),
+    personalizado: {
+      fundo: cor(p.fundo, PERSONALIZADO_PADRAO.fundo),
+      fundo2: cor(p.fundo2, null),
+      menu: cor(p.menu, PERSONALIZADO_PADRAO.menu),
+      cartao: cor(p.cartao, PERSONALIZADO_PADRAO.cartao),
+    },
   };
 }
 
 function resolverModo(modo, sistemaPrefereEscuro) {
-  if (modo === "claro" || modo === "escuro") return modo;
+  if (modo === "claro" || modo === "escuro" || modo === "personalizado") return modo;
   return sistemaPrefereEscuro ? "escuro" : "claro";
+}
+
+// Modo Personalizado: a pessoa escolhe fundo (com degradê opcional), barra
+// lateral e painéis. Todo o resto (textos, bordas, campos) é calculado para
+// continuar legível sobre cada uma dessas cores.
+function variaveisPersonalizadas(tema) {
+  const p = tema.personalizado;
+  const fundos = p.fundo2 ? [p.fundo, p.fundo2] : [p.fundo];
+  const textoCartao = textoParaFundos([p.cartao]);
+  const textoMenu = textoParaFundos([p.menu]);
+  const textoFundo = textoParaFundos(fundos);
+  const cartaoEscuro = luminancia(p.cartao) < 0.18;
+  const destaque = tema.destaque || PALETAS[tema.paleta][cartaoEscuro ? "escuro" : "claro"].destaque;
+  return {
+    "--cor-fundo": p.fundo,
+    "--fundo-imagem": p.fundo2 ? `linear-gradient(160deg, ${p.fundo}, ${p.fundo2})` : "none",
+    // Degradê com cores muito diferentes: nenhuma cor de letra serve nas duas
+    // pontas, então os títulos ganham uma sombra leve para destacar.
+    "--sombra-texto-fundo":
+      piorContraste(textoFundo, fundos) >= 4.5
+        ? "none"
+        : textoFundo === "#ffffff" || textoFundo === TEXTO_CLARO
+          ? "0 1px 3px rgba(0, 0, 0, 0.7)"
+          : "0 1px 3px rgba(255, 255, 255, 0.8)",
+    "--cor-cartao": p.cartao,
+    "--cor-menu": p.menu,
+    "--cor-texto": textoFundo,
+    "--cor-texto-suave": piorContraste(textoFundo, fundos) >= 4.5 ? textoSuaveParaFundos(textoFundo, fundos) : textoFundo,
+    "--cor-texto-cartao": textoCartao,
+    "--cor-texto-suave-cartao": textoSuaveParaFundos(textoCartao, [p.cartao]),
+    "--cor-texto-menu": textoMenu,
+    "--cor-texto-suave-menu": textoSuaveParaFundos(textoMenu, [p.menu]),
+    "--cor-destaque": destaque,
+    "--cor-destaque-escuro": escurecer(destaque, 0.15),
+    "--cor-texto-no-destaque": corDeTextoSobre(destaque),
+    "--cor-realce": misturar(destaque, p.cartao, 0.3),
+    "--cor-borda": misturar(textoCartao, p.cartao, 0.16),
+    "--cor-perigo": cartaoEscuro ? "#f2867d" : "#b3261e",
+    "color-scheme": cartaoEscuro ? "dark" : "light",
+  };
 }
 
 // Tema -> variáveis CSS que o site usa (as mesmas do css/estilo.css).
 function variaveisDoTema(temaBruto, sistemaPrefereEscuro) {
   const tema = normalizarTema(temaBruto);
   const modo = resolverModo(tema.modo, sistemaPrefereEscuro);
+  if (modo === "personalizado") return variaveisPersonalizadas(tema);
+
   const cores = PALETAS[tema.paleta][modo];
   const destaque = tema.destaque || cores.destaque;
   return {
     "--cor-fundo": cores.fundo,
+    "--fundo-imagem": "none",
+    "--sombra-texto-fundo": "none",
     "--cor-cartao": cores.cartao,
+    "--cor-menu": cores.menu,
     "--cor-texto": cores.texto,
     "--cor-texto-suave": cores.textoSuave,
+    "--cor-texto-cartao": cores.texto,
+    "--cor-texto-suave-cartao": cores.textoSuave,
+    "--cor-texto-menu": cores.texto,
+    "--cor-texto-suave-menu": cores.textoSuave,
     "--cor-destaque": destaque,
     "--cor-destaque-escuro": escurecer(destaque, 0.15),
     "--cor-texto-no-destaque": corDeTextoSobre(destaque),
     "--cor-realce": cores.realce,
     "--cor-borda": cores.borda,
-    "--cor-menu": cores.menu,
     "--cor-perigo": modo === "escuro" ? "#f2867d" : "#b3261e",
     "color-scheme": modo === "escuro" ? "dark" : "light",
   };
@@ -219,16 +311,40 @@ function criarDialogoCores() {
       <h2 id="titulo-cores">🎨 Cores do seu dashboard</h2>
 
       <fieldset>
-        <legend>Tema</legend>
-        <div class="grade-paletas">${opcoesPaletas}</div>
-      </fieldset>
-
-      <fieldset>
         <legend>Modo</legend>
         <div class="abas abas-modo">
           <label><input type="radio" name="modo" value="auto"><span>Automático</span></label>
           <label><input type="radio" name="modo" value="claro"><span>☀️ Claro</span></label>
           <label><input type="radio" name="modo" value="escuro"><span>🌙 Escuro</span></label>
+          <label><input type="radio" name="modo" value="personalizado"><span>🎨 Personalizado</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-mostrar="pronto">
+        <legend>Tema</legend>
+        <div class="grade-paletas">${opcoesPaletas}</div>
+      </fieldset>
+
+      <fieldset data-mostrar="personalizado">
+        <legend>Suas cores</legend>
+        <p class="aviso-etapa">Escolha cada parte. As letras ficam claras ou escuras sozinhas para continuar legíveis.</p>
+        <div class="grade-cores-livres">
+          <label class="cor-livre">
+            <input type="color" name="corFundo">
+            <span>Fundo da página</span>
+          </label>
+          <label class="cor-livre">
+            <input type="color" name="corMenu">
+            <span>Barra lateral</span>
+          </label>
+          <label class="cor-livre">
+            <input type="color" name="corCartao">
+            <span>Painéis</span>
+          </label>
+          <div class="cor-livre">
+            <input type="color" name="corFundo2" aria-label="Segunda cor do degradê">
+            <label><input type="checkbox" name="usarDegrade"> Degradê no fundo</label>
+          </div>
         </div>
       </fieldset>
 
@@ -236,11 +352,11 @@ function criarDialogoCores() {
         <legend>Cor de destaque</legend>
         <label class="campo-check">
           <input type="checkbox" name="usarDestaque">
-          <span>Usar uma cor minha</span>
+          <span>Usar uma cor minha (botões, menu e links)</span>
         </label>
         <input type="color" name="destaque" class="seletor-cor" aria-label="Escolher cor de destaque">
         <p id="aviso-contraste" class="aviso-contraste" role="status" hidden>
-          ⚠️ Essa cor aparece pouco sobre o fundo. Tente uma mais forte ou mais clara.
+          ⚠️ Essa cor aparece pouco sobre os painéis. Tente uma mais forte ou mais clara.
         </p>
       </fieldset>
 
@@ -261,14 +377,33 @@ function criarDialogoCores() {
   const form = dialogo.querySelector("form");
 
   // Qualquer mudança aplica na hora e salva.
-  form.addEventListener("input", () => {
+  form.addEventListener("input", (evento) => {
+    const entrandoNoPersonalizado =
+      evento.target.name === "modo" && form.modo.value === "personalizado" && temaAtual.modo !== "personalizado";
+
+    // Ao entrar no Personalizado, começa com as cores que estão na tela,
+    // para a troca não dar um "susto".
+    if (entrandoNoPersonalizado) {
+      const vars = variaveisDoTema(temaAtual, sistemaPrefereEscuro());
+      form.corFundo.value = vars["--cor-fundo"];
+      form.corMenu.value = vars["--cor-menu"];
+      form.corCartao.value = vars["--cor-cartao"];
+    }
+
     const destaqueLivre = form.usarDestaque.checked;
-    form.destaque.disabled = !destaqueLivre;
+    const degrade = form.usarDegrade.checked;
     mudarTema({
       paleta: form.paleta.value,
       modo: form.modo.value,
       destaque: destaqueLivre ? form.destaque.value : null,
+      personalizado: {
+        fundo: form.corFundo.value,
+        fundo2: degrade ? form.corFundo2.value : null,
+        menu: form.corMenu.value,
+        cartao: form.corCartao.value,
+      },
     });
+    atualizarCamposVisiveis(form);
   });
 
   form.querySelector('[data-acao="restaurar"]').addEventListener("click", () => {
@@ -279,13 +414,29 @@ function criarDialogoCores() {
   return dialogo;
 }
 
+// Mostra a grade de temas ou as cores livres, conforme o modo.
+function atualizarCamposVisiveis(form) {
+  const personalizado = form.modo.value === "personalizado";
+  form.querySelector('[data-mostrar="pronto"]').hidden = personalizado;
+  form.querySelector('[data-mostrar="personalizado"]').hidden = !personalizado;
+  form.destaque.disabled = !form.usarDestaque.checked;
+  form.corFundo2.disabled = !form.usarDegrade.checked;
+}
+
 function preencherDialogo(dialogo) {
   const form = dialogo.querySelector("form");
+  const vars = variaveisDoTema(temaAtual, sistemaPrefereEscuro());
+  const p = temaAtual.personalizado;
   form.paleta.value = temaAtual.paleta;
   form.modo.value = temaAtual.modo;
   form.usarDestaque.checked = Boolean(temaAtual.destaque);
-  form.destaque.disabled = !temaAtual.destaque;
-  form.destaque.value = temaAtual.destaque || variaveisDoTema(temaAtual, sistemaPrefereEscuro())["--cor-destaque"];
+  form.destaque.value = temaAtual.destaque || vars["--cor-destaque"];
+  form.corFundo.value = p.fundo;
+  form.corMenu.value = p.menu;
+  form.corCartao.value = p.cartao;
+  form.usarDegrade.checked = Boolean(p.fundo2);
+  form.corFundo2.value = p.fundo2 || escurecer(p.fundo, 0.35);
+  atualizarCamposVisiveis(form);
   atualizarAvisoContraste();
   document.getElementById("estado-tema").textContent = "";
 }
