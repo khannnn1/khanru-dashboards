@@ -61,6 +61,12 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
 - Para testar páginas sem login: criar um `teste-*.html` temporário com um
   Supabase falso e apagar depois (nunca commitar).
 - Site publicado: https://khannnn1.github.io/khanru-dashboards/ (branch `main`).
+  Antes de publicar, rodar `python scripts/atualizar_versao.py` (troca o
+  `?v=` dos CSS/JS, para o navegador não usar arquivo velho; o Pages guarda
+  cache por 10 min).
+- Agenda: cabeçalho, mini calendário e "Próximos dias" são nossos (o
+  `headerToolbar` do FullCalendar está desligado). A cor de cada evento vai
+  na variável `--cor-evento` (eventDidMount) e o CSS desenha as pílulas.
 - `profiles.can_see_finance` só muda por SQL no painel: o grant de update
   cobre só `nome` e `tema`.
 - `supabase/`: `config.toml`, migrações (`migrations/`) e Edge Functions

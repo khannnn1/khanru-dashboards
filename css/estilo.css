@@ -487,40 +487,335 @@ h2 {
   outline: 3px solid var(--cor-destaque);
 }
 
-/* ---------- Agenda (FullCalendar) ---------- */
+/* ---------- Agenda ----------
+   Inspirada em agendas modernas: grade leve, o dia de hoje num círculo,
+   eventos como "pílulas" de fundo suave com uma barrinha da cor do evento. */
 .conteudo-largo {
   max-width: 1200px;
 }
 
+.conteudo-agenda {
+  max-width: 1320px;
+  padding-top: 24px;
+}
+
+.agenda-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 20px;
+  align-items: start;
+}
+
+.agenda-principal {
+  padding: 20px 20px 12px;
+}
+
+/* Cabeçalho próprio */
+.agenda-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.agenda-rotulo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cor-destaque);
+}
+
+.agenda-titulo h1 {
+  margin: 2px 0 0;
+  font-size: 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+.agenda-titulo h1::first-letter {
+  text-transform: uppercase;
+}
+
+.agenda-controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.grupo-setas {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.botao-redondo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-texto);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 0 2px;
+}
+
+.botao-redondo:hover {
+  background: var(--cor-campo);
+}
+
+.botao-redondo.pequeno {
+  width: 28px;
+  height: 28px;
+  font-size: 1.05rem;
+}
+
+.botao-hoje {
+  padding: 7px 16px;
+  border-radius: 999px;
+}
+
+.seletor-visao {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--cor-campo);
+}
+
+.seletor-visao button {
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-suave);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.seletor-visao button[aria-pressed="true"] {
+  background: var(--cor-cartao);
+  color: var(--cor-texto);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Lateral */
+.agenda-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 24px;
+}
+
+.botao-novo-evento {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-size: 1rem;
+  box-shadow: var(--sombra);
+}
+
+.mini-calendario {
+  padding: 14px;
+}
+
+.mini-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.mini-titulo {
+  font-weight: 600;
+}
+
+.mini-titulo::first-letter {
+  text-transform: uppercase;
+}
+
+.mini-calendario table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.mini-calendario th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--cor-texto-suave);
+  padding-bottom: 4px;
+}
+
+.mini-calendario td {
+  text-align: center;
+  padding: 1px 0;
+}
+
+.mini-dia {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cor-texto);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.mini-dia:hover {
+  background: var(--cor-campo);
+}
+
+.mini-dia.fora-do-mes {
+  color: var(--cor-texto-suave);
+  opacity: 0.55;
+}
+
+.mini-dia.no-periodo {
+  background: color-mix(in srgb, var(--cor-destaque) 18%, transparent);
+}
+
+.mini-dia.hoje {
+  background: var(--cor-destaque);
+  color: var(--cor-texto-no-destaque);
+  font-weight: 700;
+}
+
+.mini-dia.tem-evento::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+}
+
+.mini-dia.hoje.tem-evento::after {
+  background: var(--cor-texto-no-destaque);
+}
+
+.proximos {
+  padding: 16px;
+}
+
+.proximos h2 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.lista-proximos,
+.lista-proximos ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lista-proximos > li + li {
+  margin-top: 12px;
+}
+
+.proximos-dia {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+  margin-bottom: 4px;
+}
+
+.proximo-evento {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 6px 8px 6px 10px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  border-left: 3px solid var(--cor-evento);
+  background: color-mix(in srgb, var(--cor-evento) 12%, var(--cor-cartao));
+  color: var(--cor-texto);
+}
+
+.proximo-evento:hover {
+  background: color-mix(in srgb, var(--cor-evento) 22%, var(--cor-cartao));
+}
+
+.proximo-evento.do-par {
+  border-left-style: dashed;
+}
+
+.proximo-nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.proximo-hora {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--cor-texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.legenda-agenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--cor-texto-suave);
+}
+
+.legenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legenda-meu,
+.legenda-par {
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
+  border-left: 3px solid var(--cor-destaque);
+  background: color-mix(in srgb, var(--cor-destaque) 18%, transparent);
+}
+
+.legenda-par {
+  border-left-style: dashed;
+}
+
+/* ----- FullCalendar ----- */
 #calendario {
-  --fc-border-color: var(--cor-borda);
+  --fc-border-color: color-mix(in srgb, var(--cor-borda) 70%, transparent);
   --fc-page-bg-color: var(--cor-cartao);
   --fc-neutral-bg-color: var(--cor-campo);
   --fc-list-event-hover-bg-color: var(--cor-campo);
-  --fc-today-bg-color: color-mix(in srgb, var(--cor-realce) 45%, transparent);
+  --fc-today-bg-color: transparent;
   --fc-event-bg-color: var(--cor-destaque);
   --fc-event-border-color: var(--cor-destaque);
-  --fc-event-text-color: var(--cor-texto-no-destaque);
-  --fc-button-bg-color: var(--cor-cartao);
-  --fc-button-border-color: var(--cor-borda);
-  --fc-button-text-color: var(--cor-texto);
-  --fc-button-hover-bg-color: var(--cor-campo);
-  --fc-button-hover-border-color: var(--cor-borda);
-  --fc-button-active-bg-color: var(--cor-destaque);
-  --fc-button-active-border-color: var(--cor-destaque);
+  --fc-event-text-color: var(--cor-texto);
   --fc-now-indicator-color: var(--cor-perigo);
-}
-
-#calendario .fc-button-active {
-  color: var(--cor-texto-no-destaque);
-}
-
-#calendario .fc-toolbar-title {
-  font-size: 1.25rem;
-}
-
-#calendario .fc-toolbar-title::first-letter {
-  text-transform: uppercase;
+  --fc-highlight-color: color-mix(in srgb, var(--cor-destaque) 14%, transparent);
+  font-size: 0.9rem;
 }
 
 #calendario a {
@@ -528,25 +823,291 @@ h2 {
   text-decoration: none;
 }
 
-#calendario .fc-daygrid-day,
-#calendario .fc-timegrid-slot {
+/* Grade mais leve: sem moldura externa, linhas finas */
+#calendario .fc-scrollgrid {
+  border: none;
+}
+
+#calendario .fc-scrollgrid td:last-of-type,
+#calendario .fc-scrollgrid th:last-of-type {
+  border-right: none;
+}
+
+#calendario .fc-col-header-cell {
+  border-left: none;
+  border-right: none;
+  padding: 6px 0;
+}
+
+#calendario .fc-col-header-cell-cushion {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+}
+
+/* Mês: número do dia no canto, hoje num círculo */
+#calendario .fc-daygrid-day {
   cursor: pointer;
+  transition: background 0.15s;
+}
+
+#calendario .fc-daygrid-day:hover {
+  background: color-mix(in srgb, var(--cor-campo) 70%, transparent);
+}
+
+#calendario .fc-dayGridMonth-view .fc-daygrid-day-frame {
+  min-height: 104px;
+}
+
+/* No mês, eventos com horário mostram só o nome (o horário aparece ao passar o mouse) */
+#calendario .fc-dayGridMonth-view .fc-daygrid-dot-event .fc-event-time {
+  display: none;
+}
+
+#calendario .fc-daygrid-day-top {
+  flex-direction: row;
+  padding: 6px 6px 2px;
+}
+
+#calendario .fc-daygrid-day-number {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0;
+}
+
+#calendario .fc-day-today .fc-daygrid-day-number {
+  background: var(--cor-destaque);
+  color: var(--cor-texto-no-destaque);
+  font-weight: 700;
+}
+
+#calendario .fc-day-other .fc-daygrid-day-top {
+  opacity: 0.4;
+}
+
+#calendario .fc-day-sat,
+#calendario .fc-day-sun {
+  background: color-mix(in srgb, var(--cor-campo) 45%, transparent);
+}
+
+/* Eventos como pílulas suaves */
+#calendario .fc-event {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#calendario .fc-daygrid-block-event,
+#calendario .fc-timegrid-event {
+  background: color-mix(in srgb, var(--cor-evento, var(--cor-destaque)) 20%, var(--cor-cartao));
+  border-left: 3px solid var(--cor-evento, var(--cor-destaque));
+  box-shadow: none;
+}
+
+#calendario .fc-daygrid-block-event .fc-event-main,
+#calendario .fc-timegrid-event .fc-event-main {
+  color: var(--cor-texto);
+  padding: 2px 6px;
+}
+
+#calendario .fc-daygrid-event {
+  margin: 1px 4px 2px;
+  font-size: 0.8rem;
+}
+
+#calendario .fc-daygrid-dot-event {
+  padding: 2px 4px;
+}
+
+#calendario .fc-daygrid-dot-event:hover {
+  background: var(--cor-campo);
+}
+
+#calendario .fc-daygrid-event-dot {
+  border-color: var(--cor-evento, var(--cor-destaque));
+  border-width: 4px;
+}
+
+#calendario .fc-event-time {
+  font-weight: 400;
+  color: var(--cor-texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+#calendario .fc-event-title {
+  font-weight: 600;
+}
+
+#calendario .fc-daygrid-more-link {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cor-destaque);
+  margin-left: 6px;
 }
 
 /* Eventos que o par compartilhou: borda tracejada e sem arrastar */
 #calendario .evento-parceiro {
-  border-style: dashed;
-  opacity: 0.85;
   cursor: default;
 }
 
-@media (max-width: 720px) {
-  #calendario .fc-toolbar-title {
-    font-size: 1rem;
+#calendario .fc-daygrid-block-event.evento-parceiro,
+#calendario .fc-timegrid-event.evento-parceiro {
+  border-left-style: dashed;
+}
+
+#calendario .fc-daygrid-dot-event.evento-parceiro .fc-daygrid-event-dot {
+  border-style: dashed;
+  border-width: 2px;
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+}
+
+/* Semana e dia: "SEG." em cima e o número grande embaixo */
+#calendario .fc-timegrid .fc-col-header-cell-cushion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cab-dia-numero {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--cor-texto);
+}
+
+#calendario .fc-day-today .cab-dia-numero {
+  background: var(--cor-destaque);
+  color: var(--cor-texto-no-destaque);
+}
+
+#calendario .fc-timegrid-slot {
+  height: 2.6em;
+  cursor: pointer;
+}
+
+#calendario .fc-timegrid-slot-minor {
+  border-top-style: none;
+}
+
+#calendario .fc-timegrid-slot-label-cushion,
+#calendario .fc-timegrid-axis-cushion {
+  font-size: 0.72rem;
+  color: var(--cor-texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+#calendario .fc-timegrid-col.fc-day-today {
+  background: color-mix(in srgb, var(--cor-destaque) 5%, transparent);
+}
+
+#calendario .fc-timegrid-now-indicator-line {
+  border-width: 2px 0 0;
+}
+
+#calendario .fc-timegrid-now-indicator-arrow {
+  border: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--fc-now-indicator-color);
+  margin-top: -5px;
+  margin-left: 2px;
+}
+
+/* Lista */
+#calendario .fc-list {
+  border: none;
+}
+
+#calendario .fc-list-day-cushion {
+  background: transparent;
+  font-size: 0.85rem;
+  text-align: left;
+  color: var(--cor-texto-suave);
+}
+
+#calendario .fc-list-day-text {
+  float: none;
+  font-weight: 700;
+}
+
+#calendario .fc-list-day-cushion::first-letter {
+  text-transform: uppercase;
+}
+
+#calendario .fc-list-event td {
+  border-color: transparent;
+}
+
+#calendario .fc-list-event-dot {
+  border-color: var(--cor-evento, var(--cor-destaque));
+}
+
+#calendario .fc-list-empty {
+  background: transparent;
+  color: var(--cor-texto-suave);
+}
+
+/* Celular: lateral vai para baixo, sem mini calendário */
+@media (max-width: 980px) {
+  .agenda-layout {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  #calendario .fc-toolbar {
-    gap: 8px;
+  .agenda-lateral {
+    position: static;
+    order: -1;
+  }
+
+  .mini-calendario,
+  .legenda-agenda {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .agenda-principal {
+    padding: 14px 10px 8px;
+  }
+
+  .agenda-titulo h1 {
+    font-size: 1.35rem;
+  }
+
+  .agenda-controles {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .so-computador {
+    display: none;
+  }
+
+  #calendario .fc-dayGridMonth-view .fc-daygrid-day-frame {
+    min-height: 64px;
+  }
+
+  #calendario .fc-daygrid-event {
+    font-size: 0.7rem;
+  }
+
+  .proximos {
+    display: none;
   }
 }
 
@@ -1116,4 +1677,9 @@ h2 {
 .dialogo {
   max-height: calc(100vh - 32px);
   overflow-y: auto;
+}
+
+#calendario .fc-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-borda) transparent;
 }

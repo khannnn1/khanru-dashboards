@@ -6,25 +6,73 @@
   <title>Agenda · Khanru</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💞</text></svg>">
   <meta name="theme-color" content="#f7ede4">
-  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/estilo.css?v=202611072336">
   <!-- Aplica o tema salvo antes de a página aparecer -->
-  <script src="js/tema.js"></script>
+  <script src="js/tema.js?v=202611072336"></script>
 </head>
 <body>
   <div class="layout">
     <nav id="menu" class="menu" aria-label="Menu principal"></nav>
 
-    <main class="conteudo conteudo-largo">
-      <header class="cabecalho-pagina">
-        <h1>Agenda</h1>
-        <p>Clique num dia para criar um evento. Arraste para mudar a data. 💞 marca os eventos que seu par compartilhou.</p>
-      </header>
-
+    <main class="conteudo conteudo-agenda">
       <p id="aviso-agenda" class="aviso-erro" role="alert" hidden></p>
 
-      <section class="cartao">
-        <div id="calendario"></div>
-      </section>
+      <div class="agenda-layout">
+        <section class="cartao agenda-principal" aria-label="Calendário">
+          <header class="agenda-topo">
+            <div class="agenda-titulo">
+              <span class="agenda-rotulo">Agenda</span>
+              <h1 id="titulo-periodo">&nbsp;</h1>
+            </div>
+            <div class="agenda-controles">
+              <div class="grupo-setas">
+                <button id="botao-anterior" class="botao-redondo" type="button" aria-label="Período anterior">‹</button>
+                <button id="botao-hoje" class="botao botao-secundario botao-hoje" type="button">Hoje</button>
+                <button id="botao-proximo" class="botao-redondo" type="button" aria-label="Próximo período">›</button>
+              </div>
+              <div id="seletor-visao" class="seletor-visao" role="group" aria-label="Visualização">
+                <button type="button" data-visao="dayGridMonth" aria-pressed="false">Mês</button>
+                <button type="button" data-visao="timeGridWeek" aria-pressed="false" class="so-computador">Semana</button>
+                <button type="button" data-visao="timeGridDay" aria-pressed="false">Dia</button>
+                <button type="button" data-visao="listWeek" aria-pressed="false">Lista</button>
+              </div>
+            </div>
+          </header>
+          <div id="calendario"></div>
+        </section>
+
+        <aside class="agenda-lateral" aria-label="Resumo da agenda">
+          <button id="botao-novo-evento" class="botao botao-novo-evento" type="button">＋ Novo evento</button>
+
+          <section id="mini-calendario" class="cartao mini-calendario" aria-label="Mini calendário">
+            <div class="mini-topo">
+              <span class="mini-titulo"></span>
+              <div>
+                <button class="botao-redondo pequeno mini-anterior" type="button" aria-label="Mês anterior">‹</button>
+                <button class="botao-redondo pequeno mini-proximo" type="button" aria-label="Próximo mês">›</button>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr><th>D</th><th>S</th><th>T</th><th>Q</th><th>Q</th><th>S</th><th>S</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </section>
+
+          <section class="cartao proximos" aria-label="Próximos dias">
+            <h2>Próximos dias</h2>
+            <ul id="lista-proximos" class="lista-proximos">
+              <li class="vazio vazio-pequeno">Carregando...</li>
+            </ul>
+          </section>
+
+          <p class="legenda-agenda">
+            <span class="legenda-item"><span class="legenda-meu" aria-hidden="true"></span>Seus eventos</span>
+            <span class="legenda-item"><span class="legenda-par" aria-hidden="true"></span>💞 Do seu par</span>
+          </p>
+        </aside>
+      </div>
     </main>
   </div>
 
@@ -82,11 +130,11 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.22/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.22/locales/pt-br.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/menu.js"></script>
-  <script src="js/notificacoes.js"></script>
-  <script src="js/sessao.js"></script>
-  <script src="js/agenda.js"></script>
+  <script src="js/config.js?v=202611072336"></script>
+  <script src="js/menu.js?v=202611072336"></script>
+  <script src="js/notificacoes.js?v=202611072336"></script>
+  <script src="js/sessao.js?v=202611072336"></script>
+  <script src="js/agenda.js?v=202611072336"></script>
   <script>
     protegerPagina().then((sessao) => {
       if (sessao) iniciarAgenda(sessao.usuario);
