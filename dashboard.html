@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="carregando">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +37,13 @@
     </main>
   </div>
 
+  <!-- A ordem importa: biblioteca do Supabase, configuração, menu, sessão -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/menu.js"></script>
+  <script src="js/sessao.js"></script>
+  <script>
+    protegerPagina();
+  </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="carregando">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,19 +11,82 @@
   <div class="layout">
     <nav id="menu" class="menu" aria-label="Menu principal"></nav>
 
-    <main class="conteudo">
+    <main class="conteudo conteudo-largo">
       <header class="cabecalho-pagina">
         <h1>Agenda</h1>
-        <p>Seu calendário de mês, semana e dia.</p>
+        <p>Clique num dia para criar um evento. Arraste para mudar a data. 💞 marca os eventos que seu par compartilhou.</p>
       </header>
-        <section class="cartao">
-          <h2>Calendário</h2>
-          <p class="aviso-etapa">O calendário (FullCalendar) chega na etapa 4.</p>
-        </section>
+
+      <p id="aviso-agenda" class="aviso-erro" role="alert" hidden></p>
+
+      <section class="cartao">
+        <div id="calendario"></div>
+      </section>
     </main>
   </div>
 
+  <dialog id="dialogo-evento" class="dialogo" aria-labelledby="titulo-dialogo">
+    <form id="form-evento" novalidate>
+      <h2 id="titulo-dialogo">Novo evento</h2>
+
+      <p id="aviso-parceiro" class="aviso-etapa" hidden>
+        Este evento foi compartilhado pelo seu par. Só quem criou pode editar.
+      </p>
+
+      <label class="campo">
+        <span>Nome</span>
+        <input name="titulo" type="text" maxlength="200" required>
+      </label>
+
+      <label class="campo-check">
+        <input name="diaInteiro" type="checkbox">
+        <span>Dia inteiro</span>
+      </label>
+
+      <div class="campos-lado-a-lado">
+        <label class="campo">
+          <span>Início</span>
+          <input name="inicio" type="datetime-local" required>
+        </label>
+        <label class="campo">
+          <span>Fim (opcional)</span>
+          <input name="fim" type="datetime-local">
+        </label>
+      </div>
+
+      <fieldset class="campo">
+        <legend>Cor</legend>
+        <div id="cores-evento" class="cores-evento"></div>
+      </fieldset>
+
+      <label class="campo-check">
+        <input name="compartilhar" type="checkbox">
+        <span>Compartilhar com meu par</span>
+      </label>
+
+      <p id="mensagem-evento" class="mensagem" role="status"></p>
+
+      <div class="botoes-dialogo">
+        <button id="botao-apagar" class="botao botao-perigo" type="button" hidden>Apagar</button>
+        <button id="botao-cancelar" class="botao botao-secundario" type="button">Fechar</button>
+        <button class="botao" type="submit">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- A ordem importa: bibliotecas, configuração, menu, sessão, agenda -->
+  <!-- FullCalendar 6 (versão estável que conheço bem; a 7 mudou a API) -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.22/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.22/locales/pt-br.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/menu.js"></script>
+  <script src="js/sessao.js"></script>
+  <script src="js/agenda.js"></script>
+  <script>
+    protegerPagina().then((sessao) => {
+      if (sessao) iniciarAgenda(sessao.usuario);
+    });
+  </script>
 </body>
 </html>
