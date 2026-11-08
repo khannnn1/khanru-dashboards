@@ -50,6 +50,11 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
   variáveis CSS inline; salva em `localStorage` e em `profiles.tema` (o
   perfil vence). O teste `tests/tema.test.js` exige contraste mínimo em
   todas as paletas: paleta nova precisa passar nele.
+  Modo `personalizado`: a pessoa escolhe fundo (degradê opcional), barra
+  lateral (`--cor-menu`) e painéis (`--cor-cartao`); o texto de cada
+  superfície é calculado (`--cor-texto-cartao`, `--cor-texto-menu`...).
+  No CSS, `.cartao`, `.dialogo`, `.menu` etc. trocam `--cor-texto` para o
+  da sua superfície; campos usam `--cor-campo`, nunca `--cor-fundo`.
 - `js/inicio.js` (dashboard.html): saudação com nome editável e cartões de
   eventos de hoje, lembretes de hoje, notas fixadas e finanças (só com
   `can_see_finance`). Reaproveita funções de lembretes.js e anotacoes.js.
