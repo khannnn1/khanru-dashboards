@@ -50,6 +50,9 @@ Plano completo: https://claude.ai/artifact/8vjqsMaP73eJueYoxSZrk3
   variáveis CSS inline; salva em `localStorage` e em `profiles.tema` (o
   perfil vence). O teste `tests/tema.test.js` exige contraste mínimo em
   todas as paletas: paleta nova precisa passar nele.
+- `js/inicio.js` (dashboard.html): saudação com nome editável e cartões de
+  eventos de hoje, lembretes de hoje, notas fixadas e finanças (só com
+  `can_see_finance`). Reaproveita funções de lembretes.js e anotacoes.js.
 - Para testar páginas sem login: criar um `teste-*.html` temporário com um
   Supabase falso e apagar depois (nunca commitar).
 - Site publicado: https://khannnn1.github.io/khanru-dashboards/ (branch `main`).
